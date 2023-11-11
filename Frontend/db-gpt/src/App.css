@@ -38,6 +38,7 @@
 } */
 
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@900&display=swap');
+@import "~bootstrap/dist/css/bootstrap.css";
 .App {
   display: flex;
   flex-direction: column;
@@ -81,11 +82,14 @@ p {
   line-height: 24px;
 }
 
-.container{
+.OuterContainer{
   /* background-color: #131316; */
   background-color: black;
-  width:40vw;
+  width:50vw !important;
+  padding:20px;
   display: flex;
+  padding-left: 45px !important;
+  padding-right: 45px !important;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -95,19 +99,32 @@ p {
   border-radius: 5px;
 
 }
-.responseClass{
-  /* max-height: 20vh; */
+/* .responseClass{
+  max-height: 100px !important;
   width: 500px;
+  overflow: auto;
   background-color: black;
   color: white;
   border: 1px solid transparent;
   border-radius: 5px;
 
+} */
+.dbapiInput{
+  display: flex;
+  align-items: center;
+  width:100%;
+  justify-content: center;
 }
+
+.margin20{
+  margin:20px;
+}
+
 .title{
   background-image: linear-gradient(43deg, #4158D0 0%, #C850C0 46%, #FFCC70 100%);
 -webkit-background-clip: text;
   color: transparent;
+  font-weight:600;
 }
 
 button{
@@ -119,7 +136,7 @@ button{
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 100px;
+  max-width: 100px !important;
   height: 100px;
   background-color: rgba(0, 0, 0, 0.5);
   border: 1px solid #ccc;
@@ -133,6 +150,44 @@ button{
   width: 50px;
   height: 50px;
 }
+
+
+
+.responseClass {
+  max-height: 200px;
+  overflow-y: scroll;
+  scroll-behavior: smooth;
+  width:100%;
+  background-color: black;
+}
+
+.chatButton{
+  max-width: 30px !important;
+}
+.user-message {
+  background-color: #3498db;
+  color: white;
+  border-radius: 8px;
+  padding: 8px;
+  width:70%;
+  margin-bottom: 10px;
+  text-align: right;
+  float: right;
+}
+
+.bot-message {
+  background-color: #2ecc71;
+  color: white;
+  width:70%;
+  border-radius: 8px;
+  padding: 8px;
+  margin-bottom: 10px;
+  text-align: left;
+  float: left;
+}
+
+
+
 @keyframes spin {
   from {
     transform: rotate(0deg);

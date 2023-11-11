@@ -1,107 +1,52 @@
-// // import logo from './logo.svg';
-// // import './App.css';
-
-// // function App() {
-// //   return (
-// //     <div className="App">
-// //       <header className="App-header">
-// //         <img src={logo} className="App-logo" alt="logo" />
-// //         <p>
-// //           Edit <code>src/App.js</code> and save to reload.
-// //         </p>
-// //         <a
-// //           className="App-link"
-// //           href="https://reactjs.org"
-// //           target="_blank"
-// //           rel="noopener noreferrer"
-// //         >
-// //           Learn React
-// //         </a>
-// //       </header>
-// //     </div>
-// //   );
-// // }
-
-// // export default App;
-
-
-// import React, { useState } from 'react';
-// import axios from 'axios';
-
-// function App() {
-//   const [inputType, setInputType] = useState('DB URI');
-//   const [databaseUri, setDatabaseUri] = useState('');
-//   const [openaiApiKey, setOpenaiApiKey] = useState('');
-//   const [userInput, setUserInput] = useState('');
-//   const [response, setResponse] = useState('');
-
-//   const chatWithDb = async () => {
-//     const res = await axios.post('http://localhost:8000/chat', {
-//       input_type: inputType,
-//       database_uri: databaseUri,
-//       openai_api_key: openaiApiKey,
-//       user_input: userInput,
-//     });
-//     setResponse(res.data.response);
-//   };
-
-//   return (
-//     <div className="App">
-//       <select value={inputType} onChange={e => setInputType(e.target.value)}>
-//         <option value="DB URI">DB URI</option>
-//         <option value="CSV">CSV</option>
-//       </select>
-//       <input type="text" value={databaseUri} onChange={e => setDatabaseUri(e.target.value)} placeholder="Database URI" />
-//       <input type="password" value={openaiApiKey} onChange={e => setOpenaiApiKey(e.target.value)} placeholder="OpenAI API Key" />
-//       <input type="text" value={userInput} onChange={e => setUserInput(e.target.value)} placeholder="Your question" />
-//       <button onClick={chatWithDb}>Chat</button>
-//       <p>{response}</p>
-//     </div>
-//   );
-// }
-
-// export default App;
-
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import './App.css';
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap/dist/js/bootstrap.bundle.min";
 
 function App() {
-  const [inputType, setInputType] = useState('DB URI');
   const [databaseUri, setDatabaseUri] = useState('');
   const [openaiApiKey, setOpenaiApiKey] = useState('');
   const [userInput, setUserInput] = useState('');
   const [response, setResponse] = useState('');
-  const [uploadedFile, setUploadedFile] = useState(null);
-  const [chatButtonClicked, setChatButtonClicked] = useState(false);
+  const [chatHistory, setChatHistory] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+  const [temperature, setTemperature] = useState(0); // Initial temperature value
 
-  const validateInput = () => {
-    // Check if the database URI is valid.
-    const isDatabaseUriValid = databaseUri.match(/^https?:\/\/[a-zA-Z0-9]+\.[a-zA-Z]+:[0-9]+\/[a-zA-Z0-9_]+$/);
+  const chatContainerRef = useRef(null);
+  const scrollToBottom = useRef(null);
 
-    // Check if the OpenAI API key is valid.
-    const isOpenaiApiKeyValid = openaiApiKey.match(/^sk-[a-zA-Z0-9]+$/);
-
-    // Set the button state based on the validity of the input.
-    setIsButtonDisabled(!isDatabaseUriValid || !isOpenaiApiKeyValid);
-  };
+  const inputType = 'DB URI';
 
   useEffect(() => {
     // Reset the state of other fields when inputType changes
     setDatabaseUri('');
     setOpenaiApiKey('');
     setUserInput('');
-    setUploadedFile(null);
     setResponse('');
+    setChatHistory([]);
+    
   }, [inputType]);
+
+
+  useEffect(() => {
+    if (scrollToBottom.current) {
+      scrollToBottom.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [chatHistory]);
+
+
+  useEffect(() => {
+    // Scroll to the bottom when chatHistory changes
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [chatHistory]);
 
   const LoadingAnimation = () => {
     return (
       <div className="loading-animation">
-        <img src="/loading-spinner.gif" alt="Loading..." />
+        <img src="/loading.gif" alt="Loading..." />
         <div className="loading-text">Loading...</div>
       </div>
     );
@@ -109,126 +54,109 @@ function App() {
 
   const chatWithDb = async () => {
     setIsLoading(true);
-
     try {
       const res = await axios.post('http://localhost:8000/chat', {
         input_type: inputType,
         database_uri: databaseUri,
         openai_api_key: openaiApiKey,
         user_input: userInput,
+        temperature: temperature, // Send the temperature value
       });
       setResponse(res.data.response);
-      setChatButtonClicked(true);
-      console.log("RESPONSEEE",response);
     } catch (error) {
       console.error('Error:', error);
     } finally {
       setIsLoading(false);
+      // Fetch chat history after sending a message
+      getChatHistory();
+      setUserInput('');
+    }
+  };
+
+  const handleTemperatureChange = (e) => {
+    setTemperature(e.target.value);
+  };
+
+
+  const getChatHistory = async () => {
+    try {
+      const res = await axios.get('http://localhost:8000/get_chat_history');
+      setChatHistory(res.data);
+      console.log("RESSS:",res.data);
+    } catch (error) {
+      console.error('Error fetching chat history:', error);
     }
   };
 
   return (
     <div className="App">
-      <div className="container">
+      <div className="container OuterContainer">
+        {/* <div className="OuterContainer"></div> */}
         <h1 className="title">DB-GPT</h1>
-        {/* <select value={inputType} onChange={e => setInputType(e.target.value)}>
-          <option value="DB URI">DB URI</option>
-          <option value="CSV">CSV</option>
-        </select> */}
-        <input type="text" value={databaseUri} onChange={e => setDatabaseUri(e.target.value)} placeholder="Database URI🔗" />
-        <input type="password" value={openaiApiKey} onChange={e => setOpenaiApiKey(e.target.value)} placeholder="OPENAI API Key🔑" />
-        <input type="text" value={userInput} onChange={e => setUserInput(e.target.value)} placeholder="Your question🙋‍♂️" />
-        <button onClick={chatWithDb}>Chat 💬</button>
-        <div className="responseClass">
-          {/* { chatButtonClicked ? 
-            <p>RESPONSE: {response} {isLoading && <LoadingAnimation />} </p>: <p></p>
-            } */}
-            {chatButtonClicked && isLoading && <LoadingAnimation />}
-                <p>RESPONSE: {response}</p>
-            </div>
-              <p>postgresql://prudhvisample:hGNBZu3xX1Ln@ep-solitary-sky-27823475.us-east-2.aws.neon.tech/neondb</p>
-        <p>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</p>
-              <p>who acted in Jailer movie?</p>
+
+
+        <div className="row">
+          <div className="dbapiInput">
+              <input className="margin20" type="text" value={databaseUri} onChange={e => setDatabaseUri(e.target.value)} placeholder="Database URI🔗" />
+          </div>
+          <div className="dbapiInput">
+              <input className="margin20" type="password" value={openaiApiKey} onChange={e => setOpenaiApiKey(e.target.value)} placeholder="OPENAI API Key🔑" />
+          </div>
+        </div>
+
+
+<div className="row">
+          <div className="responseClass chat-container" ref={chatContainerRef}>
+            {chatHistory.map((message, index) => (
+              <div
+                key={index}
+                className={message.user === 'User' ? 'user-message' : 'bot-message'}
+              >
+                {message.text}
+              </div>
+            ))}
+            {isLoading && <LoadingAnimation />}
+            <div ref={scrollToBottom}></div>
+          </div>
+        </div>
+
+
+      
+        {openaiApiKey && databaseUri?
+              <div className="row">
+
+                        {/* Add the temperature slider */}
+        <div className="row">
+          <div className="dbapiInput">
+            <label htmlFor="temperatureSlider" className="form-label margin20">
+              Temperature: {temperature}
+            </label>
+            <input
+              type="range"
+              className="form-range"
+              id="temperatureSlider"
+              min="0"
+              max="1"
+              step="0.5"
+              value={temperature}
+              onChange={handleTemperatureChange}
+            />
+          </div>
+        </div>
+
+
+
+                <div className="dbapiInput">
+                  <input className="margin20" type="text" value={userInput} id="inputTextBox" name="inputTextBox" onChange={e => setUserInput(e.target.value)} placeholder="Your question🙋‍♂️" />
+                </div>          
+                <div className="chatButton">
+                  <button type="button" class="btn btn-primary chatButton" className="margin20" onClick={chatWithDb}>Chat 💬</button>
+              </div>
+          </div>:<div></div>}
+        <p>who acted in Jailer movie?</p>
       </div>
     </div>
   );
 }
 
 export default App;
-
-
-
-
-
-
-// import React, { useState, useEffect } from 'react';
-// import axios from 'axios';
-
-// function App() {
-//   const [inputType, setInputType] = useState('DB URI');
-//   const [databaseUri, setDatabaseUri] = useState('');
-//   const [openaiApiKey, setOpenaiApiKey] = useState('');
-//   const [userInput, setUserInput] = useState('');
-//   const [response, setResponse] = useState('');
-//   const [uploadedFile, setUploadedFile] = useState(null);
-
-//   useEffect(() => {
-//     // Reset the state of other fields when inputType changes
-//     setDatabaseUri('');
-//     setOpenaiApiKey('');
-//     setUserInput('');
-//     setUploadedFile(null);
-//     setResponse('');
-//   }, [inputType]);
-
-//   const chatWithDb = async () => {
-//     try {
-//       const formData = new FormData();
-//       formData.append('input_type', inputType);
-//       formData.append('openai_api_key', openaiApiKey);
-//       formData.append('user_input', userInput);
-//       if (inputType === 'DB URI') {
-//         formData.append('database_uri', databaseUri);
-//       } else if (inputType === 'CSV') {
-//         formData.append('csv_file', uploadedFile);
-//       }
-//       const res = await axios.post('http://localhost:8000/chat', formData, {
-//         headers: {
-//           'Content-Type': 'multipart/form-data'
-//         }
-//       });
-//       setResponse(res.data.response);
-
-//     } catch (error) {
-//       console.error('Error:', error);
-//     }
-//   };
-
-//   return (
-//     <div className="App">
-//       <select value={inputType} onChange={e => setInputType(e.target.value)}>
-//         <option value="DB URI">DB URI</option>
-//         <option value="CSV">CSV</option>
-//       </select>
-//       {inputType === 'DB URI' ? (
-//         <>
-//           <input type="text" value={databaseUri} onChange={e => setDatabaseUri(e.target.value)} placeholder="Database URI" />
-//           <input type="password" value={openaiApiKey} onChange={e => setOpenaiApiKey(e.target.value)} placeholder="OpenAI API Key" />
-//         </>
-//       ) : (
-//         <>
-//           <input type="file" onChange={e => setUploadedFile(e.target.files[0])} />
-//           <input type="password" value={openaiApiKey} onChange={e => setOpenaiApiKey(e.target.value)} placeholder="OpenAI API Key" />
-//         </>
-//       )}
-//       <input type="text" value={userInput} onChange={e => setUserInput(e.target.value)} placeholder="Your question" />
-//       <button onClick={chatWithDb}>Chat</button>
-//       <p>{response}</p>
-//       <p>postgresql://prudhvisample:hGNBZu3xX1Ln@ep-solitary-sky-27823475.us-east-2.aws.neon.tech/neondb</p>
-//       <p>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</p>
-//       <p>who acted in Jailer movie?</p>
-//     </div>
-//   );
-// }
-
-// export default App;
