@@ -116,6 +116,7 @@ class ChatRequest(BaseModel):
     openai_api_key: str
     user_input: str
     temperature: float 
+    verbose: bool
 
 class Message(BaseModel):
     user: str
@@ -128,12 +129,14 @@ async def chat_with_db(chat_request: ChatRequest):
     if chat_request.input_type == 'DB URI':
         os.environ['OPENAI_API_KEY'] = chat_request.openai_api_key
         db = SQLDatabase.from_uri(chat_request.database_uri)
-        llm = OpenAI(temperature=chat_request.temperature, verbose=True)
+        llm = OpenAI(temperature=chat_request.temperature, verbose=chat_request.verbose)
+
+        isverbose = chat_request.verbose
 
         agent_executor = create_sql_agent(
             llm=llm,
             toolkit=SQLDatabaseToolkit(db=db, llm=llm),
-            verbose=True,
+            verbose=isverbose,
             agent_type=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
         )
 

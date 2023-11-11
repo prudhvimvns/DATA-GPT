@@ -151,7 +151,15 @@ button{
   height: 50px;
 }
 
+.form-range{
+  border:transparent;
+}
 
+.verboseClass{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
 
 .responseClass {
   max-height: 200px;
@@ -160,9 +168,15 @@ button{
   width:100%;
   background-color: black;
 }
-
 .chatButton{
-  max-width: 30px !important;
+  /* max-width: 30px !important; */
+  display: flex;
+  align-items: center;
+  /* width:100%; */
+  justify-content: center;
+}
+.tempClass{
+  padding-left:80px !important;
 }
 .user-message {
   background-color: #3498db;

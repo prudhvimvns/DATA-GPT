@@ -12,6 +12,7 @@ function App() {
   const [chatHistory, setChatHistory] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [temperature, setTemperature] = useState(0); // Initial temperature value
+  const [isVerbose, setIsVerbose] = useState(false);
 
   const chatContainerRef = useRef(null);
   const scrollToBottom = useRef(null);
@@ -61,6 +62,7 @@ function App() {
         openai_api_key: openaiApiKey,
         user_input: userInput,
         temperature: temperature, // Send the temperature value
+        verbose: !isVerbose,
       });
       setResponse(res.data.response);
     } catch (error) {
@@ -77,12 +79,15 @@ function App() {
     setTemperature(e.target.value);
   };
 
+  const handleVerboseChange = () =>{
+    console.log(!isVerbose);
+    setIsVerbose(!isVerbose);
+  }
 
   const getChatHistory = async () => {
     try {
       const res = await axios.get('http://localhost:8000/get_chat_history');
       setChatHistory(res.data);
-      console.log("RESSS:",res.data);
     } catch (error) {
       console.error('Error fetching chat history:', error);
     }
@@ -124,24 +129,37 @@ function App() {
       
         {openaiApiKey && databaseUri?
               <div className="row">
+                <div className="col-sm tempClass">
 
-                        {/* Add the temperature slider */}
-        <div className="row">
-          <div className="dbapiInput">
-            <label htmlFor="temperatureSlider" className="form-label margin20">
-              Temperature: {temperature}
-            </label>
-            <input
-              type="range"
-              className="form-range"
-              id="temperatureSlider"
-              min="0"
-              max="1"
-              step="0.5"
-              value={temperature}
-              onChange={handleTemperatureChange}
-            />
+                  {/* Add the temperature slider */}
+                  <div className="row">
+                    <div className="dbapiInput">
+                      <label htmlFor="temperatureSlider" className="form-label margin20">
+                        Temperature 🌡️: {temperature}
+                      </label>
+                      <input
+                        type="range"
+                        className="form-range"
+                        id="temperatureSlider"
+                        min="0"
+                        max="1"
+                        step="0.5"
+                        value={temperature}
+                        onChange={handleTemperatureChange}
+                      />
+                    </div>
+                  </div>
+
+
+        </div>
+
+        <div className="col-sm verboseClass">
+
+          <div class="form-check form-switch">
+            <label class="form-check-label" for="flexSwitchCheckChecked">Verbose 🐞</label>
+            <input class="form-check-input" type="checkbox" onChange={handleVerboseChange} id="flexSwitchCheckChecked"/>
           </div>
+
         </div>
 
 
