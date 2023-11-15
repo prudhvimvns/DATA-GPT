@@ -84,12 +84,19 @@ function App() {
     setIsVerbose(!isVerbose);
   }
 
+  const onHandleInput = (event)=>{
+    if(event.key==='Enter'){
+      chatWithDb();
+    }
+  }
+
   const getChatHistory = async () => {
     try {
       const res = await axios.get('http://localhost:8000/get_chat_history');
       setChatHistory(res.data);
     } catch (error) {
       console.error('Error fetching chat history:', error);
+      alert(`Error: ${error.message}`);
     }
   };
 
@@ -110,7 +117,7 @@ function App() {
         </div>
 
 
-<div className="row">
+      <div className="row width100">
           <div className="responseClass chat-container" ref={chatContainerRef}>
             {chatHistory.map((message, index) => (
               <div
@@ -123,12 +130,12 @@ function App() {
             {isLoading && <LoadingAnimation />}
             <div ref={scrollToBottom}></div>
           </div>
-        </div>
+      </div>
 
 
       
         {openaiApiKey && databaseUri?
-              <div className="row">
+          <div className="row width100">
                 <div className="col-sm tempClass">
 
                   {/* Add the temperature slider */}
@@ -137,38 +144,25 @@ function App() {
                       <label htmlFor="temperatureSlider" className="form-label margin20">
                         Temperature 🌡️: {temperature}
                       </label>
-                      <input
-                        type="range"
-                        className="form-range"
-                        id="temperatureSlider"
-                        min="0"
-                        max="1"
-                        step="0.5"
-                        value={temperature}
-                        onChange={handleTemperatureChange}
-                      />
+                      <input type="range" className="form-range" id="temperatureSlider" min="0" max="1" step="0.5" value={temperature} onChange={handleTemperatureChange}/>
                     </div>
                   </div>
+                </div>
 
+            <div className="col-sm verboseClass">
 
-        </div>
+              <div class="form-check form-switch">
+                <label class="form-check-label" for="flexSwitchCheckChecked">Verbose 🐞</label>
+                <input class="form-check-input" type="checkbox" onChange={handleVerboseChange} id="flexSwitchCheckChecked"/>
+              </div>
 
-        <div className="col-sm verboseClass">
-
-          <div class="form-check form-switch">
-            <label class="form-check-label" for="flexSwitchCheckChecked">Verbose 🐞</label>
-            <input class="form-check-input" type="checkbox" onChange={handleVerboseChange} id="flexSwitchCheckChecked"/>
-          </div>
-
-        </div>
-
-
+            </div>
 
                 <div className="dbapiInput">
-                  <input className="margin20" type="text" value={userInput} id="inputTextBox" name="inputTextBox" onChange={e => setUserInput(e.target.value)} placeholder="Your question🙋‍♂️" />
+                  <input className="margin20" type="text" value={userInput} id="inputTextBox" name="inputTextBox" onChange={e => setUserInput(e.target.value)} onKeyPress={onHandleInput} placeholder="Your question🙋‍♂️" />
                 </div>          
                 <div className="chatButton">
-                  <button type="button" class="btn btn-primary chatButton" className="margin20" onClick={chatWithDb}>Chat 💬</button>
+                  <button type="button" class="btn btn-primary chatButton" className="margin20 chatButtonClass" onClick={chatWithDb}>Chat 💬</button>
               </div>
           </div>:<div></div>}
         <p>who acted in Jailer movie?</p>

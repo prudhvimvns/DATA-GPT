@@ -199,8 +199,14 @@ button{
   text-align: left;
   float: left;
 }
-
-
+.chatButtonClass{
+  width: 5vw;
+  border-radius: 6px;
+  font-weight: 600;
+}
+.width100{
+  widht:100% !important;
+}
 
 @keyframes spin {
   from {
