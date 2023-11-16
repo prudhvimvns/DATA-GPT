@@ -56,7 +56,7 @@ function App() {
   const chatWithDb = async () => {
     setIsLoading(true);
     try {
-      const res = await axios.post('http://localhost:8000/chat', {
+      const res = await axios.post('http://ec2-3-94-212-26.compute-1.amazonaws.com:8000/chat', {
         input_type: inputType,
         database_uri: databaseUri,
         openai_api_key: openaiApiKey,
@@ -92,7 +92,7 @@ function App() {
 
   const getChatHistory = async () => {
     try {
-      const res = await axios.get('http://localhost:8000/get_chat_history');
+      const res = await axios.get('http://ec2-3-94-212-26.compute-1.amazonaws.com:8000/get_chat_history');
       setChatHistory(res.data);
     } catch (error) {
       console.error('Error fetching chat history:', error);
@@ -162,7 +162,7 @@ function App() {
                   <input className="margin20" type="text" value={userInput} id="inputTextBox" name="inputTextBox" onChange={e => setUserInput(e.target.value)} onKeyPress={onHandleInput} placeholder="Your question🙋‍♂️" />
                 </div>          
                 <div className="chatButton">
-                  <button type="button" class="btn btn-primary chatButton" className="margin20 chatButtonClass" onClick={chatWithDb}>Chat 💬</button>
+                  <button type="button" className="margin20 chatButtonClass btn btn-primary chatButton" onClick={chatWithDb}>Chat 💬</button>
               </div>
           </div>:<div></div>}
         <p>who acted in Jailer movie?</p>

@@ -34,7 +34,7 @@ app.add_middleware(
 
 class ChatRequest(BaseModel):
     input_type: str
-    database_uri: Optional[str] = None
+    database_uri: str = None
     openai_api_key: str
     user_input: str
     temperature: float 
@@ -73,6 +73,7 @@ chat_history = []  # In-memory storage for chat messages
 
 @app.post("/chat")
 async def chat_with_db(chat_request: ChatRequest):
+    print("chat_request👋👋👋👋::::",chat_request)
     try:
         if chat_request.input_type == 'DB URI':
             os.environ['OPENAI_API_KEY'] = chat_request.openai_api_key
