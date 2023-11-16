@@ -1,0 +1,11 @@
+streamlit
+langchain
+openai
+psycopg2-binary
+tabulate
+streamlit_chat
+SQLDatabase
+CORSMiddleware
+AgentType
+create_sql_agent
+os
