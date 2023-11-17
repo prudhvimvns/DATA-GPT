@@ -165,7 +165,6 @@ function App() {
                   <button type="button" className="margin20 chatButtonClass btn btn-primary chatButton" onClick={chatWithDb}>Chat 💬</button>
               </div>
           </div>:<div></div>}
-        <p>who acted in Jailer movie?</p>
       </div>
     </div>
   );
