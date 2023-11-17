@@ -136,10 +136,10 @@ button{
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  max-width: 100px !important;
-  height: 100px;
+  max-width: 300px !important;
+  height: 200px;
   background-color: rgba(0, 0, 0, 0.5);
-  border: 1px solid #ccc;
+  border: 1px solid black;
   border-radius: 5px;
   display: flex;
   align-items: center;
@@ -172,7 +172,7 @@ button{
   /* max-width: 30px !important; */
   display: flex;
   align-items: center;
-  /* width:100%; */
+  width:auto;
   justify-content: center;
 }
 .tempClass{
@@ -200,7 +200,7 @@ button{
   float: left;
 }
 .chatButtonClass{
-  width: 5vw;
+  width: auto;
   border-radius: 6px;
   font-weight: 600;
 }

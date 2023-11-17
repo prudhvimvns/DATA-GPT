@@ -44,12 +44,20 @@ function App() {
     }
   }, [chatHistory]);
 
+  // const LoadingAnimation = () => {
+  //   return (
+  //     <div className="loading-animation">
+  //       <img src="/Applications/XAMPP/xamppfiles/htdocs/DATA-GPT/Frontend/db-gpt/src/loadings.gif" alt="Loading..." />
+  //       <div className="loading-text">Loading...</div>
+  //     </div>
+  //   );
+  // };
   const LoadingAnimation = () => {
     return (
-      <div className="loading-animation">
-        <img src="/loading.gif" alt="Loading..." />
-        <div className="loading-text">Loading...</div>
-      </div>
+        <div >
+            <img className="loading-animation" src={require('./loadings.gif')} alt="Loading..." style={{ height: '100px',width: '200px' }}/>
+            {/* <div className="loading-text">Loading...</div> */}
+        </div>
     );
   };
 
@@ -57,6 +65,7 @@ function App() {
     setIsLoading(true);
     try {
       const res = await axios.post('http://ec2-3-94-212-26.compute-1.amazonaws.com:8000/chat', {
+        // const res = await axios.post('http://localhost:8000/chat', {
         input_type: inputType,
         database_uri: databaseUri,
         openai_api_key: openaiApiKey,
@@ -93,6 +102,7 @@ function App() {
   const getChatHistory = async () => {
     try {
       const res = await axios.get('http://ec2-3-94-212-26.compute-1.amazonaws.com:8000/get_chat_history');
+      // const res = await axios.get('http://localhost:8000/get_chat_history');
       setChatHistory(res.data);
     } catch (error) {
       console.error('Error fetching chat history:', error);
