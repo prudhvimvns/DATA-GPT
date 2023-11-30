@@ -26,7 +26,7 @@ function App() {
     setUserInput('');
     setResponse('');
     setChatHistory([]);
-    
+    sessionStorage.clear();
   }, [inputType]);
 
 
@@ -34,6 +34,19 @@ function App() {
     if (scrollToBottom.current) {
       scrollToBottom.current.scrollIntoView({ behavior: 'smooth' });
     }
+  }, [chatHistory]);
+
+
+  useEffect(() => {
+    const storedChatHistory = sessionStorage.getItem('chatHistory');
+    if (storedChatHistory) {
+      setChatHistory(JSON.parse(storedChatHistory));
+    }
+  }, []);
+
+
+  useEffect(() => {
+    sessionStorage.setItem('chatHistory', JSON.stringify(chatHistory));
   }, [chatHistory]);
 
 
@@ -56,16 +69,28 @@ function App() {
     return (
         <div >
             <img className="loading-animation" src={require('./loadings.gif')} alt="Loading..." style={{ height: '100px',width: '200px' }}/>
-            {/* <div className="loading-text">Loading...</div> */}
         </div>
     );
   };
 
+  const validInput = () =>{
+    // if(inputType!=="" && databaseUri!=="" && openaiApiKey!==""){
+      if(openaiApiKey!==""){
+
+      chatWithDb();
+    }
+    else{
+      alert("Enter valid details");
+    }
+
+  }
+
   const chatWithDb = async () => {
     setIsLoading(true);
+    setDatabaseUri('postgresql://postgres:rootroot@polldb.crenldggkc0j.us-east-1.rds.amazonaws.com');
     try {
-      const res = await axios.post('http://ec2-3-94-212-26.compute-1.amazonaws.com:8000/chat', {
-        // const res = await axios.post('http://localhost:8000/chat', {
+      // const res = await axios.post('http://ec2-3-94-212-26.compute-1.amazonaws.com:8000/chat', {
+        const res = await axios.post('http://localhost:8000/chat', {
         input_type: inputType,
         database_uri: databaseUri,
         openai_api_key: openaiApiKey,
@@ -95,14 +120,14 @@ function App() {
 
   const onHandleInput = (event)=>{
     if(event.key==='Enter'){
-      chatWithDb();
+      validInput();
     }
   }
 
   const getChatHistory = async () => {
     try {
-      const res = await axios.get('http://ec2-3-94-212-26.compute-1.amazonaws.com:8000/get_chat_history');
-      // const res = await axios.get('http://localhost:8000/get_chat_history');
+      // const res = await axios.get('http://ec2-3-94-212-26.compute-1.amazonaws.com:8000/get_chat_history');
+      const res = await axios.get('http://localhost:8000/get_chat_history');
       setChatHistory(res.data);
     } catch (error) {
       console.error('Error fetching chat history:', error);
@@ -118,9 +143,9 @@ function App() {
 
 
         <div className="row">
-          <div className="dbapiInput">
+          {/* <div className="dbapiInput">
               <input className="margin20" type="text" value={databaseUri} onChange={e => setDatabaseUri(e.target.value)} placeholder="Database URI🔗" />
-          </div>
+          </div> */}
           <div className="dbapiInput">
               <input className="margin20" type="password" value={openaiApiKey} onChange={e => setOpenaiApiKey(e.target.value)} placeholder="OPENAI API Key🔑" />
           </div>
@@ -144,7 +169,7 @@ function App() {
 
 
       
-        {openaiApiKey && databaseUri?
+        {openaiApiKey ?
           <div className="row width100">
                 <div className="col-sm tempClass">
 
@@ -172,7 +197,7 @@ function App() {
                   <input className="margin20" type="text" value={userInput} id="inputTextBox" name="inputTextBox" onChange={e => setUserInput(e.target.value)} onKeyPress={onHandleInput} placeholder="Your question🙋‍♂️" />
                 </div>          
                 <div className="chatButton">
-                  <button type="button" className="margin20 chatButtonClass btn btn-primary chatButton" onClick={chatWithDb}>Chat 💬</button>
+                  <button type="button" className="margin20 chatButtonClass btn btn-primary chatButton" onClick={validInput}>Chat 💬</button>
               </div>
           </div>:<div></div>}
       </div>
